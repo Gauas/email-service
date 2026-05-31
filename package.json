@@ -1,0 +1,38 @@
+{
+  "name": "email-service",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devEngines": {
+    "packageManager": {
+      "name": "pnpm",
+      "version": "^11.5.0",
+      "onFail": "download"
+    }
+  },
+  "type": "module",
+  "dependencies": {
+    "amqplib": "link:/amqplib",
+    "components": "link:/@react-email/components",
+    "dotenv": "link:/dotenv",
+    "nodemailer": "link:/nodemailer",
+    "react": "link:/react",
+    "react-dom": "link:/react-dom",
+    "render": "link:/@react-email/render",
+    "zod": "link:/zod"
+  },
+  "devDependencies": {
+    "@types/node": "^25.9.1",
+    "express": "link:/@types/express",
+    "node": "link:/@types/node",
+    "react-email": "link:/react-email",
+    "tsx": "^4.22.3",
+    "typescript": "^6.0.3"
+  }
+}
