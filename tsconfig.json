@@ -21,6 +21,7 @@
   "include": [
     "cmd/**/*.ts",
     "config/**/*.ts",
+    "consumer/**/*.ts",
     "controller/**/*.ts",
     "dto/**/*.ts",
     "infra/**/*.ts",

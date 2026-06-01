@@ -3,7 +3,6 @@ import dotenv from "dotenv";
 import { get, getEnvBool, getEnvInt } from "@/config/helper.js";
 
 export type MailMode = "log" | "smtp";
-
 export type SMTPConfig = {
   Host: string;
   Port: number;
@@ -20,6 +19,7 @@ export type Config = {
   MailMode: MailMode;
   MailFrom: string;
   MailReplyTo: string;
+  MQUrl: string;
   SMTP: SMTPConfig;
 };
 
@@ -29,6 +29,7 @@ const DEFAULT_SERVICE_NAME = "email-service";
 const DEFAULT_MAIL_MODE: MailMode = "log";
 const DEFAULT_MAIL_FROM = "no-reply@gauas.com";
 const DEFAULT_REPLY_TO = "";
+const DEFAULT_MQ_URL = "";
 const DEFAULT_SMTP_HOST = "";
 const DEFAULT_SMTP_PORT = 587;
 const DEFAULT_SMTP_SECURE = false;
@@ -46,6 +47,7 @@ export function New(): Config {
     MailMode: parseMailMode(get("MAIL_MODE", DEFAULT_MAIL_MODE)),
     MailFrom: get("MAIL_FROM", DEFAULT_MAIL_FROM),
     MailReplyTo: get("MAIL_REPLY_TO", DEFAULT_REPLY_TO),
+    MQUrl: get("MQ_URL", DEFAULT_MQ_URL),
     SMTP: {
       Host: get("SMTP_HOST", DEFAULT_SMTP_HOST),
       Port: getEnvInt("SMTP_PORT", DEFAULT_SMTP_PORT),
