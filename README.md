@@ -9,6 +9,7 @@ This project follows the same architectural split used by `account-service`:
 - `cmd`: service entrypoint
 - `config`: environment loading and validation
 - `controller`: HTTP handlers
+- `consumer`: message consumer kernel and transports
 - `dto`: request/response contracts
 - `infra`: external integrations
 - `kernel`: app bootstrap and error handling
@@ -66,4 +67,31 @@ If `INTERNAL_API_KEY` is set, requests to `/v1/email/send` must include:
 
 ```txt
 x-api-key: <INTERNAL_API_KEY>
+```
+
+## Consumer
+
+Run the consumer:
+
+```bash
+npm run start:consumer
+```
+
+Transport selection uses one variable:
+
+- `MQ_URL` set: consume from broker queue (RabbitMQ-compatible AMQP)
+- `MQ_URL` empty: consume JSONL from `stdin`
+
+Message format:
+
+```json
+{
+  "id": "evt-1",
+  "type": "email.send",
+  "payload": {
+    "to": "user@example.com",
+    "subject": "Hello",
+    "text": "Plain text body"
+  }
+}
 ```
