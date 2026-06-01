@@ -5,11 +5,14 @@
   "type": "module",
   "scripts": {
     "dev": "tsx watch cmd/main.ts",
+    "dev:consumer": "tsx watch cmd/consumer.ts",
     "build": "tsc -p tsconfig.json",
     "start": "tsx cmd/main.ts",
+    "start:consumer": "tsx cmd/consumer.ts",
     "check": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "amqplib": "^0.10.9",
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "nodemailer": "^7.0.10",
