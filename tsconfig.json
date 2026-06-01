@@ -3,12 +3,36 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
-    "rootDir": "./src",
-    "outDir": "./dist",
+    "ignoreDeprecations": "6.0",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "rootDir": ".",
+    "outDir": "dist",
     "strict": true,
     "skipLibCheck": true,
-    "jsx": "react-jsx",
-    "esModuleInterop": true
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true
   },
-  "include": ["src"]
+  "include": [
+    "cmd/**/*.ts",
+    "config/**/*.ts",
+    "controller/**/*.ts",
+    "dto/**/*.ts",
+    "infra/**/*.ts",
+    "kernel/**/*.ts",
+    "middlewares/**/*.ts",
+    "packages/**/*.ts",
+    "route/**/*.ts",
+    "service/**/*.ts",
+    "supports/**/*.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules"
+  ]
 }
