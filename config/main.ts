@@ -78,17 +78,19 @@ function validate(config: Config): void {
     throw new Error("config: MAIL_FROM is required");
   }
 
-  if (config.MailMode === "smtp") {
-    if (config.SMTP.Host === "") {
-      throw new Error("config: SMTP_HOST is required when MAIL_MODE=smtp");
-    }
+  if (config.MailMode !== "smtp") {
+    return;
+  }
 
-    if (config.SMTP.User === "") {
-      throw new Error("config: SMTP_USER is required when MAIL_MODE=smtp");
-    }
+  if (config.SMTP.Host === "") {
+    throw new Error("config: SMTP_HOST is required when MAIL_MODE=smtp");
+  }
 
-    if (config.SMTP.Pass === "") {
-      throw new Error("config: SMTP_PASS is required when MAIL_MODE=smtp");
-    }
+  if (config.SMTP.User === "") {
+    throw new Error("config: SMTP_USER is required when MAIL_MODE=smtp");
+  }
+
+  if (config.SMTP.Pass === "") {
+    throw new Error("config: SMTP_PASS is required when MAIL_MODE=smtp");
   }
 }

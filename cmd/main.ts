@@ -8,7 +8,7 @@ import { New as newService } from "@/service/main.js";
 const config = newConfig();
 const infra = newInfra(config);
 const service = newService(config, infra);
-const controller = newController(service, config);
+const controller = newController(service);
 const middleware = newMiddleware(config);
 
 newKernel(controller, middleware, config).Start();
