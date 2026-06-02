@@ -1,6 +1,5 @@
 import type { Config } from "@/config/main.js";
 import type { RecipientInput, SendEmailRequest, TemplateData } from "@/dto/request/mail.js";
-import { sendEmailSchema } from "@/dto/request/mail.js";
 import type { SendEmailResponse } from "@/dto/response/mail.js";
 import type { Infra } from "@/infra/main.js";
 import type { MailAddressCollection, SendMailPayload, SendMailResult } from "@/infra/mailer.js";
@@ -8,7 +7,7 @@ import type { RequestContext } from "@/middlewares/context.js";
 import { HttpStatus } from "@/packages/httpresp/status.js";
 import { Render } from "@/packages/mailings/templates/main.js";
 import type { Mailing } from "@/packages/mailings/templates/constants.js";
-import { appError, mapValidationError } from "@/service/helper.js";
+import { appError } from "@/service/helper.js";
 
 const EMPTY_STRING = "";
 
@@ -33,9 +32,8 @@ export class MailService {
   async Send(context: RequestContext, req: SendEmailRequest): Promise<SendEmailResponse> {
     void context;
 
-    const payload = parse(req);
-    const envelope = this.envelope(payload);
-    const content = this.content(payload);
+    const envelope = this.envelope(req);
+    const content = this.content(req);
     const result = await this.Infra.Mailer.Send(this.payload(envelope, content));
     return toResp(result);
   }
@@ -63,14 +61,6 @@ export class MailService {
 
   private payload(envelope: MailEnvelope, content: MailContent): SendMailPayload {
     return { ...envelope, ...content };
-  }
-}
-
-function parse(req: SendEmailRequest): SendEmailRequest {
-  try {
-    return sendEmailSchema.parse(req);
-  } catch (error) {
-    mapValidationError(error);
   }
 }
 
