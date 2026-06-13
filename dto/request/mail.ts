@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-import { Fail } from "@/packages/httpresp/errors.js";
+import { fail } from "@/packages/httpresp/errors.js";
 import { HttpStatus } from "@/packages/httpresp/status.js";
 
 export type RecipientInput = string | string[];
@@ -38,13 +38,13 @@ export const sendEmailSchema = z
 export type SendEmailRequest = z.infer<typeof sendEmailSchema>;
 export type TemplateData = Record<string, unknown>;
 
-export function ParseSendEmailRequest(input: unknown): SendEmailRequest {
+export function parseSendEmailRequest(input: unknown): SendEmailRequest {
   try {
     return sendEmailSchema.parse(input);
   } catch (error) {
     if (error instanceof z.ZodError) {
       const first = error.issues[FIRST_ISSUE_INDEX];
-      throw Fail(HttpStatus.BAD_REQUEST, first?.message ?? "invalid request");
+      throw fail(HttpStatus.BAD_REQUEST, first?.message ?? "invalid request");
     }
 
     throw error;

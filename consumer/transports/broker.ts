@@ -1,4 +1,4 @@
-import amqp, { type ConsumeMessage } from "amqplib";
+import amqp, { type Channel, type ChannelModel, type ConsumeMessage } from "amqplib";
 
 import type { ConsumerHandlerFn, ConsumerMessage, MessageConsumer } from "@/consumer/types.js";
 
@@ -7,8 +7,8 @@ const DEFAULT_QUEUE = "email.send";
 const DEFAULT_PREFETCH = 10;
 
 export class BrokerConsumer implements MessageConsumer {
-  private connection: amqp.ChannelModel | null;
-  private channel: amqp.Channel | null;
+  private connection: ChannelModel | null;
+  private channel: Channel | null;
 
   constructor(private readonly url: string) {
     this.connection = null;
