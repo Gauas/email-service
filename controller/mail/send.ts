@@ -1,17 +1,19 @@
 import type { NextFunction, Request, Response } from "express";
 
-import { ParseSendEmailRequest } from "@/dto/request/mail.js";
-import { Ok } from "@/packages/httpresp/response.js";
-import type { Service } from "@/service/main.js";
+import { parseSendEmailRequest } from "@/dto/request/mail.js";
+import * as http from "@/packages/httpresp/response.js";
+import type { Service } from "@/service/init.js";
 
-export class Handler {
-  constructor(private readonly Service: Service) {}
+export class MailController {
+  constructor(private readonly service: Service) {}
 
   async Send(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const payload = ParseSendEmailRequest(req.body);
-      const data = await this.Service.SendEmail(res.locals.context, payload);
-      Ok(res, data);
+      const payload = parseSendEmailRequest(req.body);
+
+      const data = await this.service.SendEmail(res.locals.context, payload);
+
+      http.success(res, data);
     } catch (error) {
       next(error);
     }

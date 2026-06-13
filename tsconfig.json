@@ -19,18 +19,20 @@
     "resolveJsonModule": true
   },
   "include": [
-    "cmd/**/*.ts",
+    "main.ts",
     "config/**/*.ts",
     "consumer/**/*.ts",
     "controller/**/*.ts",
     "dto/**/*.ts",
     "infra/**/*.ts",
     "kernel/**/*.ts",
+    "mailer/**/*.ts",
     "middlewares/**/*.ts",
     "packages/**/*.ts",
     "route/**/*.ts",
     "service/**/*.ts",
-    "supports/**/*.ts"
+    "supports/**/*.ts",
+    "template/**/*.ts"
   ],
   "exclude": [
     "dist",

@@ -1,24 +1,22 @@
 export type ErrorLike = Error & {
-  Code: number;
-  Message: string;
+  code: number;
+  message: string;
 };
 
 export class AppError extends Error {
-  Code: number;
-  Message: string;
+  code: number;
 
   constructor(code: number, message: string) {
     super(message);
-    this.Code = code;
-    this.Message = message;
+    this.code = code;
   }
 }
 
-export function Fail(code: number, message: string): AppError {
+export function fail(code: number, message: string): AppError {
   return new AppError(code, message);
 }
 
-export function ErrorBody(status: number, message: string) {
+export function errorBody(status: number, message: string) {
   return {
     status,
     error: message

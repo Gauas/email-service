@@ -1,17 +1,14 @@
 import nodemailer from "nodemailer";
 
-import type { Config } from "@/config/main.js";
+import type { Config } from "@/config/init.js";
 
-const JSON_LOG_INDENT = 2;
-const EMPTY_RECIPIENTS_LENGTH = 0;
-
-export type MailAddressCollection = {
+export type MailRecipients = {
   to: string[];
   cc: string[];
   bcc: string[];
 };
 
-export type SendMailPayload = MailAddressCollection & {
+export type SendMailPayload = MailRecipients & {
   from: string;
   replyTo?: string;
   subject: string;
@@ -26,7 +23,14 @@ export type SendMailResult = {
   Rejected: string[];
 };
 
-export class Mailer {
+export interface MailTransport {
+  Send(payload: SendMailPayload): Promise<SendMailResult>;
+}
+
+const LOG_INDENT = 2;
+const NO_RECIPIENT = 0;
+
+export class NodemailerTransport implements MailTransport {
   private readonly transporter;
 
   constructor(private readonly config: Config) {
@@ -49,29 +53,29 @@ export class Mailer {
 
   async Send(payload: SendMailPayload): Promise<SendMailResult> {
     if (this.config.MailMode === "log" || this.transporter === null) {
-      const messageId = `log-${Date.now()}`;
+      const messageID = `log-${Date.now()}`;
 
       console.log(
         JSON.stringify(
           {
             service: this.config.ServiceName,
             type: "email.send",
-            message_id: messageId,
+            message_id: messageID,
             payload
           },
           null,
-          JSON_LOG_INDENT
+          LOG_INDENT
         )
       );
 
       return {
-        MessageID: messageId,
+        MessageID: messageID,
         Accepted: payload.to,
         Rejected: []
       };
     }
 
-    const result = await this.transporter.sendMail(toPayload(payload));
+    const result = await this.transporter.sendMail(toNodemailerPayload(payload));
 
     return {
       MessageID: result.messageId,
@@ -81,12 +85,12 @@ export class Mailer {
   }
 }
 
-function toPayload(payload: SendMailPayload) {
+function toNodemailerPayload(payload: SendMailPayload) {
   return {
     from: payload.from,
     to: payload.to,
-    cc: payload.cc.length > EMPTY_RECIPIENTS_LENGTH ? payload.cc : undefined,
-    bcc: payload.bcc.length > EMPTY_RECIPIENTS_LENGTH ? payload.bcc : undefined,
+    cc: payload.cc.length > NO_RECIPIENT ? payload.cc : undefined,
+    bcc: payload.bcc.length > NO_RECIPIENT ? payload.bcc : undefined,
     replyTo: payload.replyTo,
     subject: payload.subject,
     text: payload.text,

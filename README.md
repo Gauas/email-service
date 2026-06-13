@@ -6,18 +6,21 @@ Generic email service written in Node.js + TypeScript.
 
 This project follows the same architectural split used by `account-service`:
 
-- `cmd`: service entrypoint
+- `main.ts`: service entrypoint
 - `config`: environment loading and validation
 - `controller`: HTTP handlers
 - `consumer`: message consumer kernel and transports
 - `dto`: request/response contracts
 - `infra`: external integrations
+- `mailer`: email composition, template rendering, and mail transports
 - `kernel`: app bootstrap and error handling
 - `middlewares`: global and route middleware
-- `packages`: shared HTTP response helpers
+- `packages`: shared helpers
 - `route`: route registration
 - `service`: business logic
-- `supports`: template rendering support
+- `template`: email HTML templates and template renderers
+
+Module folders expose their wiring from `init.ts`. The service entrypoint stays at `main.ts`.
 
 ## API
 
@@ -34,13 +37,17 @@ Example request:
 ```json
 {
   "to": ["user@example.com"],
-  "subject": "Verify your email",
+  "subject": "Sign in to Gauas",
   "template": "verification",
   "data": {
     "productName": "Gauas",
-    "recipientName": "Bao",
-    "actionUrl": "https://gauas.com/verify",
-    "actionLabel": "Verify Email"
+    "code": "A9C4H2",
+    "logoUrl": "https://gauas.com/logo.svg",
+    "footerLinks": [
+      { "label": "Gauas", "url": "https://gauas.com" },
+      { "label": "Product", "url": "https://gauas.com/product" },
+      { "label": "Company", "url": "https://gauas.com/company" }
+    ]
   }
 }
 ```
@@ -63,24 +70,15 @@ Copy `.env.example` into `.env` and adjust values.
 - `MAIL_MODE=log`: log payload instead of sending
 - `MAIL_MODE=smtp`: send via SMTP using `SMTP_*`
 
-If `INTERNAL_API_KEY` is set, requests to `/v1/email/send` must include:
+If `SECRET_KEY` is set, requests to `/v1/email/send` must include:
 
 ```txt
-x-api-key: <INTERNAL_API_KEY>
+Secret-Key: <SECRET_KEY>
 ```
 
 ## Consumer
 
-Run the consumer:
-
-```bash
-npm run start:consumer
-```
-
-Transport selection uses one variable:
-
-- `MQ_URL` set: consume from broker queue (RabbitMQ-compatible AMQP)
-- `MQ_URL` empty: consume JSONL from `stdin`
+The service starts the HTTP API and the queue consumer in the same process. Set `MQ_URL` to consume from a RabbitMQ-compatible AMQP queue. If `MQ_URL` is empty, only the HTTP API starts.
 
 Message format:
 

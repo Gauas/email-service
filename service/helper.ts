@@ -1,12 +1,12 @@
 import { ZodError } from "zod";
 
-import { Fail } from "@/packages/httpresp/errors.js";
+import { fail } from "@/packages/httpresp/errors.js";
 import { HttpStatus } from "@/packages/httpresp/status.js";
 
 const FIRST_ISSUE_INDEX = 0;
 
 export function appError(code: number, message: string) {
-  return Fail(code, message);
+  return fail(code, message);
 }
 
 export function mapValidationError(error: unknown): never {

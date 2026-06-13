@@ -16,17 +16,19 @@ RUN apk add --no-cache tini && \
 
 COPY --from=deps /app/node_modules ./node_modules
 COPY package.json tsconfig.json ./
-COPY cmd ./cmd
+COPY main.ts ./main.ts
 COPY config ./config
 COPY consumer ./consumer
 COPY controller ./controller
 COPY dto ./dto
 COPY infra ./infra
 COPY kernel ./kernel
+COPY mailer ./mailer
 COPY middlewares ./middlewares
 COPY packages ./packages
 COPY route ./route
 COPY service ./service
+COPY template ./template
 COPY entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh && \
