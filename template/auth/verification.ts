@@ -1,71 +1,70 @@
+import { DEFAULT_LOGO_URL } from "@/template/logo.js";
 import type { Mailing } from "@/template/init.js";
 
 const EMPTY = "";
 const DEFAULT_PRODUCT = "Gauas";
 const DEFAULT_CODE = "000000";
-const DEFAULT_TITLE_PREFIX = "Sign in to";
-const DEFAULT_MESSAGE = "Copy and paste the temporary verification code to sign in. If you did not try to sign in, you can safely ignore this email.";
-const DEFAULT_FOOTER = "This email was sent automatically.";
+const DEFAULT_EXPIRES_IN = "10";
 const DEFAULT_LOGO_ALT = "Gauas";
+const PREHEADER = "Use this verification code to securely sign in to your Gauas account.";
+const PREHEADER_SPACER = "&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;";
 
 const S = {
-  page: "margin:0;padding:0;background:#efeee8;color:#292724;",
-  outer: "width:100%;background:#efeee8;border-collapse:collapse;",
-  shell: "padding:58px 24px 44px;",
-  main: "width:100%;max-width:960px;border-collapse:collapse;text-align:center;",
-  title: "font-family:Arial,Helvetica,sans-serif;font-size:32px;line-height:40px;font-weight:700;color:#2b2926;padding:0 0 66px;",
-  codeBox: "width:100%;max-width:640px;border-collapse:separate;background:#222222;border-radius:16px;",
-  code: "font-family:'Courier New',Courier,monospace;font-size:44px;line-height:52px;font-weight:700;letter-spacing:12px;color:#ffffff;text-align:center;padding:48px 28px;",
-  message: "font-family:Arial,Helvetica,sans-serif;font-size:30px;line-height:40px;font-weight:400;color:#2b2926;padding:0 0 112px;",
-  brand: "font-family:Arial,Helvetica,sans-serif;font-size:22px;line-height:28px;font-weight:700;letter-spacing:.04em;color:#8f8c86;text-transform:uppercase;padding:0 0 26px;",
-  footer: "font-family:Arial,Helvetica,sans-serif;font-size:18px;line-height:26px;color:#9b9892;",
-  link: "color:#9b9892;text-decoration:none;",
-  fallbackLogo: "font-family:Arial,Helvetica,sans-serif;font-size:48px;line-height:56px;font-weight:800;color:#242321;",
-  imageLogo: "display:block;border:0;outline:none;text-decoration:none;width:64px;height:64px;object-fit:contain;"
-};
-
-type FooterLink = {
-  label: string;
-  url?: string;
+  page: "margin:0;padding:0;background-color:#f6f8fa;color:#24292f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;",
+  outer: "width:100%;background-color:#f6f8fa;border-collapse:collapse;",
+  shell: "padding:24px 12px;",
+  main: "width:100%;max-width:600px;border-collapse:collapse;",
+  logoCell: "padding:0 0 20px 0;text-align:center;",
+  imageLogo: "display:block;margin:0 auto;border:0;outline:none;text-decoration:none;width:44px;height:44px;",
+  fallbackLogo: "font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:22px;line-height:28px;font-weight:700;color:#111827;letter-spacing:0;",
+  card: "background-color:#ffffff;border:1px solid #d8dee4;border-radius:8px;padding:28px 24px 24px 24px;",
+  title: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:24px;line-height:32px;font-weight:700;color:#111827;",
+  paragraph: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:15px;line-height:24px;font-weight:400;color:#374151;",
+  meta: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:14px;line-height:22px;font-weight:400;color:#4b5563;",
+  codeBox: "width:100%;border-collapse:separate;background-color:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;",
+  code: "font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,Courier,monospace;font-size:36px;line-height:44px;font-weight:700;letter-spacing:6px;color:#111827;text-align:center;padding:22px 16px;",
+  warning: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:21px;font-weight:400;color:#6b7280;",
+  footerWrap: "padding:18px 12px 0 12px;",
+  footerDivider: "border-top:1px solid #d8dee4;padding-top:16px;",
+  footer: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:20px;font-weight:400;color:#6b7280;text-align:center;",
+  link: "color:#0969da;text-decoration:none;",
+  strong: "font-weight:600;color:#111827;"
 };
 
 type VerificationView = {
   product: string;
-  title: string;
   code: string;
-  message: string;
-  footer: string;
+  expiresIn: string;
   logoUrl: string;
   logoAlt: string;
-  footerLinks: FooterLink[];
 };
 
 export function Verification(data: Record<string, unknown>): Mailing {
   const view = toView(data);
 
   return {
-    subject: view.title,
+    subject: "Sign in to Gauas",
     html: renderHtml(view),
     text: renderText(view)
   };
 }
 
 function toView(data: Record<string, unknown>): VerificationView {
-  const product = readString(data, "productName", DEFAULT_PRODUCT);
+  const product = readString(data, ["product_name", "productName", "product"], DEFAULT_PRODUCT);
 
   return {
     product,
-    code: readString(data, "code", readString(data, "verificationCode", DEFAULT_CODE)),
-    title: readString(data, "title", `${DEFAULT_TITLE_PREFIX} ${product}`),
-    message: readString(data, "message", DEFAULT_MESSAGE),
-    footer: readString(data, "footer", DEFAULT_FOOTER),
-    logoUrl: readString(data, "logoUrl", EMPTY),
-    logoAlt: readString(data, "logoAlt", DEFAULT_LOGO_ALT),
-    footerLinks: readFooterLinks(data.footerLinks)
+    code: readString(data, ["otp_code", "otpCode", "code", "verificationCode"], DEFAULT_CODE),
+    expiresIn: readString(data, ["expires_in", "expiresIn"], DEFAULT_EXPIRES_IN),
+    logoUrl: readString(data, ["logo_url", "logoUrl"], DEFAULT_LOGO_URL),
+    logoAlt: readString(data, ["logo_alt", "logoAlt"], DEFAULT_LOGO_ALT)
   };
 }
 
 function renderHtml(view: VerificationView): string {
+  const title = "Sign in to Gauas";
+  const code = formatCode(view.code);
+
   return `<!doctype html>
 <html lang="en">
   <head>
@@ -73,20 +72,27 @@ function renderHtml(view: VerificationView): string {
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <meta name="supported-color-schemes" content="light">
-    <title>${escapeHtml(view.title)}</title>
+    <title>${escapeHtml(title)}</title>
   </head>
   <body style="${S.page}">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;">${escapeHtml(view.code)} is your temporary verification code.</div>
+    <div style="display:none!important;visibility:hidden;mso-hide:all;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;color:transparent;">${escapeHtml(PREHEADER)}${PREHEADER_SPACER}</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="${S.outer}">
       <tr>
         <td align="center" style="${S.shell}">
           <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="${S.main}">
-            ${row(renderLogo(view), "padding:0 0 54px;")}
-            ${row(escapeHtml(view.title), S.title)}
-            ${row(codeBox(view.code), "padding:0 0 62px;", "center")}
-            ${row(`<div style="max-width:830px;margin:0 auto;">${escapeHtml(view.message)}</div>`, S.message, "center")}
-            ${row(escapeHtml(view.product), S.brand)}
-            ${row(renderFooter(view), S.footer)}
+            ${row(renderLogo(view), S.logoCell, "center")}
+            <tr>
+              <td style="${S.card}">
+                <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
+                  ${row(`<h1 style="${S.title}">Hello,</h1>`, "padding:0 0 12px 0;")}
+                  ${row(`<p style="${S.paragraph}">We received a request to sign in to your Gauas account. Use the verification code below to continue.</p>`, "padding:0 0 20px 0;")}
+                  ${row(codeBox(code), "padding:4px 0 20px 0;", "center")}
+                  ${row(`<p style="${S.meta}">This code expires in <strong style="${S.strong}">${escapeHtml(view.expiresIn)} minutes</strong>.</p>`, "padding:0 0 16px 0;")}
+                  ${row(`<p style="${S.warning}">If you didn't request this email, you can safely ignore it.</p>`, "padding:16px 0 0 0;border-top:1px solid #e5e7eb;")}
+                </table>
+              </td>
+            </tr>
+            ${row(renderFooter(), S.footerWrap, "center")}
           </table>
         </td>
       </tr>
@@ -96,16 +102,20 @@ function renderHtml(view: VerificationView): string {
 }
 
 function renderText(view: VerificationView): string {
-  const footer = footerLinksText(view.footerLinks) || view.footer;
+  const code = formatCode(view.code);
 
-  return `${view.title}
+  return `Hello,
 
-${view.code}
+We received a request to sign in to your Gauas account. Use the verification code below to continue.
 
-${view.message}
+${code}
 
-${view.product}
-${footer}`;
+This code expires in ${view.expiresIn} minutes.
+
+If you didn't request this email, you can safely ignore it.
+
+Need help? Contact support@gauas.com
+\u00a9 2026 Gauas. All rights reserved.`;
 }
 
 function row(content: string, style: string, align?: "center"): string {
@@ -114,73 +124,39 @@ function row(content: string, style: string, align?: "center"): string {
 }
 
 function codeBox(code: string): string {
-  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="${S.codeBox}"><tr><td style="${S.code}">${escapeHtml(formatCode(code))}</td></tr></table>`;
+  return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="${S.codeBox}"><tr><td style="${S.code}">${escapeHtml(code)}</td></tr></table>`;
+}
+
+function renderFooter(): string {
+  return `<div style="${S.footerDivider}">
+    <p style="${S.footer}">Need help? Contact <a href="mailto:support@gauas.com" style="${S.link}">support@gauas.com</a></p>
+    <p style="${S.footer}">&copy; 2026 Gauas. All rights reserved.</p>
+  </div>`;
 }
 
 function renderLogo(view: VerificationView): string {
   if (view.logoUrl === EMPTY) return fallbackLogo(view.product);
 
-  return `<img src="${escapeHtml(view.logoUrl)}" width="64" height="64" alt="${escapeHtml(view.logoAlt)}" style="${S.imageLogo}">`;
+  return `<img src="${escapeHtml(view.logoUrl)}" width="44" height="44" alt="${escapeHtml(view.logoAlt)}" style="${S.imageLogo}">`;
 }
 
 function fallbackLogo(product: string): string {
-  const letters = product
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0])
-    .join("")
-    .toUpperCase();
-
-  return `<div style="${S.fallbackLogo}">${escapeHtml(letters || "G")}</div>`;
-}
-
-function renderFooter(view: VerificationView): string {
-  return footerLinksHtml(view.footerLinks) || escapeHtml(view.footer);
-}
-
-function footerLinksHtml(links: FooterLink[]): string {
-  return links
-    .map((link) => {
-      const label = escapeHtml(link.label);
-
-      if (!link.url) return label;
-
-      return `<a href="${escapeHtml(link.url)}" style="${S.link}">${label}</a>`;
-    })
-    .join(" <span style=\"color:#aaa7a1;\">&bull;</span> ");
-}
-
-function footerLinksText(links: FooterLink[]): string {
-  return links.map((link) => (link.url ? `${link.label}: ${link.url}` : link.label)).join(" - ");
+  return `<div style="${S.fallbackLogo}">${escapeHtml(product)}</div>`;
 }
 
 function formatCode(value: string): string {
   return value.replaceAll(/\s+/g, EMPTY).toUpperCase();
 }
 
-function readFooterLinks(value: unknown): FooterLink[] {
-  if (!Array.isArray(value)) return [];
+function readString(data: Record<string, unknown>, keys: string[], def: string): string {
+  for (const key of keys) {
+    const value = data[key];
 
-  return value
-    .map((item) => {
-      if (typeof item === "string" && item.trim() !== EMPTY) return { label: item.trim() };
-      if (!item || typeof item !== "object") return null;
+    if (typeof value === "string" && value.trim() !== EMPTY) return value.trim();
+    if (typeof value === "number" && Number.isFinite(value)) return String(value);
+  }
 
-      const record = item as Record<string, unknown>;
-      const label = typeof record.label === "string" ? record.label.trim() : EMPTY;
-      const url = typeof record.url === "string" ? record.url.trim() : EMPTY;
-
-      if (label === EMPTY) return null;
-
-      return { label, url: url === EMPTY ? undefined : url };
-    })
-    .filter((item): item is FooterLink => item !== null);
-}
-
-function readString(data: Record<string, unknown>, key: string, def: string): string {
-  const value = data[key];
-  return typeof value === "string" && value.trim() !== EMPTY ? value.trim() : def;
+  return def;
 }
 
 function escapeHtml(value: string): string {

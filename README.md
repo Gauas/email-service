@@ -42,7 +42,7 @@ Example request:
   "data": {
     "productName": "Gauas",
     "code": "A9C4H2",
-    "logoUrl": "https://gauas.com/logo.svg",
+    "logoUrl": "https://cdn.gauas.com/gauas/images/public/a_20260614_062644_0000.jpg",
     "footerLinks": [
       { "label": "Gauas", "url": "https://gauas.com" },
       { "label": "Product", "url": "https://gauas.com/product" },

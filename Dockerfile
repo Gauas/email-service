@@ -29,6 +29,7 @@ COPY packages ./packages
 COPY route ./route
 COPY service ./service
 COPY template ./template
+COPY .public ./.public
 COPY entrypoint.sh ./entrypoint.sh
 
 RUN chmod +x ./entrypoint.sh && \
