@@ -9,6 +9,7 @@ import { fail } from "@/packages/httpresp/errors.js";
 import { HttpStatus } from "@/packages/httpresp/status.js";
 
 const JSON_BODY_LIMIT = "1mb";
+const MuteLog = ["/v1/email/health"];
 
 export function Init(config: Config): Middleware {
   return new Middleware(config);
@@ -21,12 +22,15 @@ export class Middleware {
     server.use((req: Request, res: Response, next: NextFunction) => {
       const startedAt = Date.now();
       const requestId = crypto.randomUUID();
+      const logFilters = !MuteLog.includes(req.path);
 
       res.locals.context = { requestId } satisfies RequestContext;
 
       res.setHeader("x-request-id", requestId);
 
       res.on("finish", () => {
+        if (!logFilters) return;
+
         console.log(
           JSON.stringify({
             request_id: requestId,
