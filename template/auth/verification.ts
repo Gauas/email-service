@@ -5,8 +5,9 @@ const EMPTY = "";
 const DEFAULT_PRODUCT = "Gauas";
 const DEFAULT_CODE = "000000";
 const DEFAULT_EXPIRES_IN = "10";
-const DEFAULT_SUPPORT_EMAIL = "support@gauas.com";
 const DEFAULT_LOGO_ALT = "Gauas";
+const PREHEADER = "Use this verification code to securely sign in to your Gauas account.";
+const PREHEADER_SPACER = "&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;&zwnj;&nbsp;";
 
 const S = {
   page: "margin:0;padding:0;background-color:#f6f8fa;color:#24292f;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;",
@@ -23,6 +24,8 @@ const S = {
   codeBox: "width:100%;border-collapse:separate;background-color:#f3f4f6;border:1px solid #d1d5db;border-radius:8px;",
   code: "font-family:'SFMono-Regular',Consolas,'Liberation Mono',Menlo,Courier,monospace;font-size:36px;line-height:44px;font-weight:700;letter-spacing:6px;color:#111827;text-align:center;padding:22px 16px;",
   warning: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:13px;line-height:21px;font-weight:400;color:#6b7280;",
+  footerWrap: "padding:18px 12px 0 12px;",
+  footerDivider: "border-top:1px solid #d8dee4;padding-top:16px;",
   footer: "margin:0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;font-size:12px;line-height:20px;font-weight:400;color:#6b7280;text-align:center;",
   link: "color:#0969da;text-decoration:none;",
   strong: "font-weight:600;color:#111827;"
@@ -32,17 +35,15 @@ type VerificationView = {
   product: string;
   code: string;
   expiresIn: string;
-  supportEmail: string;
   logoUrl: string;
   logoAlt: string;
 };
 
 export function Verification(data: Record<string, unknown>): Mailing {
   const view = toView(data);
-  const code = formatCode(view.code);
 
   return {
-    subject: `${code} is your ${view.product} sign-in code`,
+    subject: "Sign in to Gauas",
     html: renderHtml(view),
     text: renderText(view)
   };
@@ -55,14 +56,13 @@ function toView(data: Record<string, unknown>): VerificationView {
     product,
     code: readString(data, ["otp_code", "otpCode", "code", "verificationCode"], DEFAULT_CODE),
     expiresIn: readString(data, ["expires_in", "expiresIn"], DEFAULT_EXPIRES_IN),
-    supportEmail: readString(data, ["support_email", "supportEmail"], DEFAULT_SUPPORT_EMAIL),
     logoUrl: readString(data, ["logo_url", "logoUrl"], DEFAULT_LOGO_URL),
     logoAlt: readString(data, ["logo_alt", "logoAlt"], DEFAULT_LOGO_ALT)
   };
 }
 
 function renderHtml(view: VerificationView): string {
-  const title = `Sign in to ${view.product}`;
+  const title = "Sign in to Gauas";
   const code = formatCode(view.code);
 
   return `<!doctype html>
@@ -75,7 +75,7 @@ function renderHtml(view: VerificationView): string {
     <title>${escapeHtml(title)}</title>
   </head>
   <body style="${S.page}">
-    <div style="display:none;max-height:0;overflow:hidden;opacity:0;color:transparent;line-height:1px;">${escapeHtml(code)} is your ${escapeHtml(view.product)} sign-in verification code.</div>
+    <div style="display:none!important;visibility:hidden;mso-hide:all;font-size:1px;line-height:1px;max-height:0;max-width:0;opacity:0;overflow:hidden;color:transparent;">${escapeHtml(PREHEADER)}${PREHEADER_SPACER}</div>
     <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="${S.outer}">
       <tr>
         <td align="center" style="${S.shell}">
@@ -84,15 +84,15 @@ function renderHtml(view: VerificationView): string {
             <tr>
               <td style="${S.card}">
                 <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="width:100%;border-collapse:collapse;">
-                  ${row(`<h1 style="${S.title}">${escapeHtml(title)}</h1>`, "padding:0 0 12px 0;")}
-                  ${row(`<p style="${S.paragraph}">Use the verification code below to complete sign in to ${escapeHtml(view.product)}.</p>`, "padding:0 0 20px 0;")}
+                  ${row(`<h1 style="${S.title}">Hello,</h1>`, "padding:0 0 12px 0;")}
+                  ${row(`<p style="${S.paragraph}">We received a request to sign in to your Gauas account. Use the verification code below to continue.</p>`, "padding:0 0 20px 0;")}
                   ${row(codeBox(code), "padding:4px 0 20px 0;", "center")}
                   ${row(`<p style="${S.meta}">This code expires in <strong style="${S.strong}">${escapeHtml(view.expiresIn)} minutes</strong>.</p>`, "padding:0 0 16px 0;")}
-                  ${row(`<p style="${S.warning}">If you did not request this code, you can safely ignore this email. For help, contact <a href="mailto:${escapeHtml(view.supportEmail)}" style="${S.link}">${escapeHtml(view.supportEmail)}</a>.</p>`, "padding:16px 0 0 0;border-top:1px solid #e5e7eb;")}
+                  ${row(`<p style="${S.warning}">If you didn't request this email, you can safely ignore it.</p>`, "padding:16px 0 0 0;border-top:1px solid #e5e7eb;")}
                 </table>
               </td>
             </tr>
-            ${row(`<p style="${S.footer}">This email was sent automatically by ${escapeHtml(view.product)}. Please do not reply to this email.</p>`, "padding:18px 12px 0 12px;", "center")}
+            ${row(renderFooter(), S.footerWrap, "center")}
           </table>
         </td>
       </tr>
@@ -102,20 +102,20 @@ function renderHtml(view: VerificationView): string {
 }
 
 function renderText(view: VerificationView): string {
-  const title = `Sign in to ${view.product}`;
   const code = formatCode(view.code);
 
-  return `${title}
+  return `Hello,
 
-Use the verification code below to complete sign in to ${view.product}.
+We received a request to sign in to your Gauas account. Use the verification code below to continue.
 
 ${code}
 
 This code expires in ${view.expiresIn} minutes.
 
-If you did not request this code, you can safely ignore this email. For help, contact ${view.supportEmail}.
+If you didn't request this email, you can safely ignore it.
 
-This email was sent automatically by ${view.product}. Please do not reply to this email.`;
+Need help? Contact support@gauas.com
+\u00a9 2026 Gauas. All rights reserved.`;
 }
 
 function row(content: string, style: string, align?: "center"): string {
@@ -125,6 +125,13 @@ function row(content: string, style: string, align?: "center"): string {
 
 function codeBox(code: string): string {
   return `<table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="${S.codeBox}"><tr><td style="${S.code}">${escapeHtml(code)}</td></tr></table>`;
+}
+
+function renderFooter(): string {
+  return `<div style="${S.footerDivider}">
+    <p style="${S.footer}">Need help? Contact <a href="mailto:support@gauas.com" style="${S.link}">support@gauas.com</a></p>
+    <p style="${S.footer}">&copy; 2026 Gauas. All rights reserved.</p>
+  </div>`;
 }
 
 function renderLogo(view: VerificationView): string {
